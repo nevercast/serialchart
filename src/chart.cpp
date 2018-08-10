@@ -1,4 +1,5 @@
 #include "chart.h"
+#include "tinyexpr/tinyexpr.h"
 
 Chart::Chart(QWidget *parent) :
     QWidget(parent),config(0)
@@ -20,6 +21,44 @@ void Chart::init(Configuration* config){
 
 void Chart::newPacket(DecoderBase* decoder){
     QList<QVariant> packetValues = decoder->getPacketValues();
+    int ctValues = packetValues.length();
+    double values[ctValues];
+    te_variable vars[ctValues];
+    QByteArray expressions[ctValues];
+    QByteArray variableNames[ctValues];
+
+    int fieldCount = config->fields.length();
+    for (int j=0; j < ctValues; j++) {
+        values[j] = packetValues[j].toDouble();
+        vars[j].address = &values[j];
+        if (j < fieldCount) {
+            variableNames[j] = config->fields[j].toLatin1();
+        } else {
+            expressions[j] = variableNames[j] = QString("Field%1").arg(QString::number(j+1)).toLatin1();
+        }
+        if (j < fieldCount) {
+            expressions[j] = config->get(config->fields[j], "expr", QString("Field%1").arg(QString::number(j+1))).toLatin1();
+        }
+        variableNames[j] = variableNames[j].toLower();
+        expressions[j] = expressions[j].toLower();
+        vars[j].name = variableNames[j].data();
+        vars[j].type = 0;
+        vars[j].context = 0;
+    }
+
+    // Evaluate expressions
+    for (int j=0; j < MIN(config->fields.length(), ctValues); j++) {
+        int err;
+        te_expr* expression = te_compile(expressions[j].data(), vars, ctValues, &err);
+        if (expression == 0) {
+            // Error occurred
+        } else {
+            double result = te_eval(expression);
+            packetValues[j] = result;
+            te_free(expression);
+        }
+    }
+
     QPainter p(&px);
     //clear one vertical line
     p.setPen(Qt::transparent);
