@@ -30,7 +30,8 @@ SOURCES += main.cpp \
     decoderhdlc.cpp \
     decoderbin.cpp \
     plugin.cpp \
-    decoderplugin.cpp
+    decoderplugin.cpp \
+    tinyexpr/tinyexpr.c
 HEADERS += mainwindow.h \
     common.h \
     portbase.h \
@@ -45,7 +46,8 @@ HEADERS += mainwindow.h \
     decoderhdlc.h \
     decoderbin.h \
     plugin.h \
-    decoderplugin.h
+    decoderplugin.h \
+    tinyexpr/tinyexpr.h
 FORMS += mainwindow.ui
 RESOURCES += resources.qrc
 OTHER_FILES += notes.txt
