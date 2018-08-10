@@ -1,0 +1,8 @@
+src/Makefile.Release
+src/Makefile.Debug
+src/Makefile
+src/object_script.SerialChart.Release
+src/object_script.SerialChart.Debug
+src/SerialChart.pro.user
+src/ui_mainwindow.h
+src/debug/
